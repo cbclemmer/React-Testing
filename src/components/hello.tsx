@@ -1,5 +1,9 @@
 import * as React from 'react'
+import Down from '../containers/down'
+import Up from '../containers/up'
 
-export interface HelloProps { compiler: string; framework: string; }
+export interface IHelloProps {
+  counter: number
+}
 
-export const Hello = (props: HelloProps) => <h1>Hello from {props.compiler} and {props.framework}</h1>;
+export default(props: IHelloProps) => <h1>{props.counter} <Up>Up</Up> <Down>Down</Down></h1>

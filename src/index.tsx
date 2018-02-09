@@ -1,9 +1,16 @@
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
+import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import reducers from './reducers'
 
-import { Hello } from './components/hello';
+import Increment from './containers/increment'
 
-ReactDOM.render(
-  <Hello compiler="Typescript" framework="React" />,
-  document.getElementById("example")
-);
+const store = createStore(reducers)
+
+render(
+  <Provider store={store}>
+    <Increment />
+  </Provider>,
+  document.getElementById('example')
+)
