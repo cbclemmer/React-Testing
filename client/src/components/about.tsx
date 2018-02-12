@@ -1,4 +1,0 @@
-import * as React from 'react'
-
-
-export default (props: any) => <p>This is the about page</p>
