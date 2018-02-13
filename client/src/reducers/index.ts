@@ -24,7 +24,7 @@ export default combineReducers({
   },
   user: (state = new User(), action) => {
     switch (action.type) {
-      case Action.REGISTER_USER:
+      case Action.LOAD_USER:
         return action.user
       default:
         return state
@@ -34,6 +34,14 @@ export default combineReducers({
     switch (action.type) {
       case Action.LOAD_SESSION:
         return action.session
+      default:
+        return state
+    }
+  },
+  isAuthenticated: (state = false, action) => {
+    switch (action.type) {
+      case Action.LOAD_SESSION:
+        return true
       default:
         return state
     }

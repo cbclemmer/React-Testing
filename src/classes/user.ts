@@ -8,6 +8,11 @@ interface IRegisterModel {
   confirmPassword: string
 }
 
+interface ILoginModel {
+  email: string
+  password: string
+}
+
 function validateRegistration(m: IRegisterModel) {
   if (!m.userName || !m.email || !m.password || !m.confirmPassword) {
     return 'Invalid request parameters'
@@ -34,14 +39,28 @@ export default class User {
   public password: string
   public error: string
 
-  public async load(db: any, id: string, data: IRegisterModel = null) {
+  public async load(db: any, id: string, regData: IRegisterModel = null, loginData: ILoginModel = null) {
     if (id === null) {
-      if (data !== null) {
-        await this.createUser(db, data)
+      if (regData !== null) {
+        await this.createUser(db, regData)
+      }
+      if (loginData !== null) {
+        await this.authenticateUser(db, loginData)
       }
     } else {
       await this.loadUser(id, db)
     }
+  }
+
+  private async authenticateUser(db: any, data: ILoginModel) {
+    const users = db.collection(Collection.User)
+    const dbUser = await users.findOne({ email: data.email, password: data.password })
+    if (!dbUser) {
+      this.error = 'Email or password is incorrect'
+      return
+    }
+    this.id = dbUser._id
+    extend(this, dbUser)
   }
 
   private async loadUser(id: string, db: any) {
@@ -64,8 +83,6 @@ export default class User {
     })).ops[0]
 
     this.id = dbUser._id
-    this.userName = dbUser.userName
-    this.email = dbUser.email
-    this.password = dbUser.password
+    extend(this, dbUser)
   }
 }

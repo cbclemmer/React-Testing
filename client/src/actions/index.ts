@@ -2,7 +2,7 @@ import User from '../classes/user'
 import Session from '../classes/session'
 
 export enum Action {
-  REGISTER_USER,
+  LOAD_USER,
   LOAD_SESSION
 }
 
@@ -28,9 +28,9 @@ export function updateText(text: string): any {
   }
 }
 
-export function registerUser(user: User) {
+export function loadUser(user: User) {
   return {
-    type: Action.REGISTER_USER,
+    type: Action.LOAD_USER,
     user
   }
 }

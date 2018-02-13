@@ -11,8 +11,8 @@ export async function post(url: string, data: any): Promise<any> {
       dataType: 'JSON'
     })
     .done((response) => {
-      if (response.err) {
-        toastr.error(response.err)
+      if (response.error) {
+        toastr.error(response.error)
       }
       res(response)
     })

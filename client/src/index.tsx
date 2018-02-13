@@ -8,8 +8,9 @@ import { createStore } from 'redux'
 import reducers from './reducers'
 
 import Register from './containers/register'
+import Login from './containers/login'
+import Nav from './containers/nav'
 
-import Nav from './page-partials/nav'
 import Home from './pages/home'
 import User from './pages/user'
 import NoMatch from './pages/noMatch'
@@ -25,6 +26,7 @@ const App = () => (
     <div>
       <Switch>
         <Route path="/home" component={Home} />
+        <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/user/:id" component={User}/>
         <Route component={NoMatch} />

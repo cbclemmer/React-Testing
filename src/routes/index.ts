@@ -15,4 +15,18 @@ export default (app: any, db: any) => {
       session
     })
   })
+
+  app.post('/user/login', async (req: any, res: any) => {
+    const user = new User()
+    await user.load(db, null, null, req.body)
+    const session = new Session()
+    if (!user.error) {
+      await session.load(db, null, user.id)
+    }
+    return res.json({
+      error: user.error,
+      user,
+      session
+    })
+  })
 }
