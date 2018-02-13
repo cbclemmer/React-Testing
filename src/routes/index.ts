@@ -1,10 +1,11 @@
 import User from '../classes/user'
 
-export default (app, db) => {
-  app.post('/user/register', async (req, res) => {
-    const error = await User.register(req.body, db)
+export default (app: any, db: any) => {
+  app.post('/user/register', async (req: any, res: any) => {
+    const user = new User(db, null, req.body)
     return res.json({
-      err: error
+      err: user.error,
+      user
     })
   })
 }

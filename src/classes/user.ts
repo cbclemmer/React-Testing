@@ -1,3 +1,5 @@
+import { extend } from 'lodash'
+
 interface IRegisterModel {
   userName: string
   email: string
@@ -22,21 +24,42 @@ function validateRegistration(m: IRegisterModel) {
 }
 
 export default class User {
-  public static async register(m: IRegisterModel, db) {
-    const error = validateRegistration(m)
-    if (error) {
-      return error
-    }
-    const users = db.collection('Users')
-    await users.insertOne({
-      userName: m.userName,
-      email: m.email,
-      password: m.password
-    })
-    return null
-  }
-
+  public id: string
   public userName: string
   public email: string
   public password: string
+  public error: string
+
+  constructor(db: any, id: number, data: IRegisterModel = null) {
+    if (id === null && data !== null) {
+      this.createUser(db, data)
+    } else {
+      this.loadUser(id, db)
+    }
+  }
+
+  private async loadUser(id: number, db: any) {
+    const users = db.collection('Users')
+    const dbUser = await users.findOne({ _id: id })
+    console.log(dbUser)
+  }
+
+  private async createUser(db: any, data: IRegisterModel) {
+    const error = validateRegistration(data)
+    if (error) {
+      this.error = error
+      return
+    }
+    const users = db.collection('Users')
+    const dbUser = (await users.insertOne({
+      userName: data.userName,
+      email: data.email,
+      password: data.password
+    }).ops[0])
+
+    this.id = dbUser._id
+    this.userName = dbUser.userName
+    this.email = dbUser.email
+    this.password = dbUser.password
+  }
 }
