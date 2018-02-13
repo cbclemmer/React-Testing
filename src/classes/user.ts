@@ -1,3 +1,4 @@
+import Collection from '../collections'
 import { extend } from 'lodash'
 
 interface IRegisterModel {
@@ -30,16 +31,18 @@ export default class User {
   public password: string
   public error: string
 
-  constructor(db: any, id: number, data: IRegisterModel = null) {
-    if (id === null && data !== null) {
-      this.createUser(db, data)
+  public async load(db: any, id: string, data: IRegisterModel = null) {
+    if (id === null) {
+      if (data !== null) {
+        await this.createUser(db, data)
+      }
     } else {
-      this.loadUser(id, db)
+      await this.loadUser(id, db)
     }
   }
 
-  private async loadUser(id: number, db: any) {
-    const users = db.collection('Users')
+  private async loadUser(id: string, db: any) {
+    const users = db.collection(Collection.User)
     const dbUser = await users.findOne({ _id: id })
     console.log(dbUser)
   }
@@ -50,7 +53,7 @@ export default class User {
       this.error = error
       return
     }
-    const users = db.collection('Users')
+    const users = db.collection(Collection.User)
     const dbUser = (await users.insertOne({
       userName: data.userName,
       email: data.email,
