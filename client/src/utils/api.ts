@@ -1,7 +1,7 @@
 import * as $ from 'jquery'
 import * as toastr from 'toastr'
 
-export async function post(url: string, data: any) {
+export async function post(url: string, data: any): Promise<any> {
   return new Promise((res, rej) => {
     $.ajax({
       url,

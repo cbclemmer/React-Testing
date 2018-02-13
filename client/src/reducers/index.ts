@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import { Action } from '../actions'
 import User from '../classes/user'
+import Session from '../classes/session'
 
 export default combineReducers({
   counter: (state = 0, action) => {
@@ -24,7 +25,15 @@ export default combineReducers({
   user: (state = new User(), action) => {
     switch (action.type) {
       case Action.REGISTER_USER:
-        return User.fromRegisterModel(action.model)
+        return action.user
+      default:
+        return state
+    }
+  },
+  session: (state = new Session(), action) => {
+    switch (action.type) {
+      case Action.LOAD_SESSION:
+        return action.session
       default:
         return state
     }

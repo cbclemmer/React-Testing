@@ -1,7 +1,9 @@
-import { RegisterModel } from '../pages/register'
+import User from '../classes/user'
+import Session from '../classes/session'
 
 export enum Action {
-  REGISTER_USER
+  REGISTER_USER,
+  LOAD_SESSION
 }
 
 export interface IAction {
@@ -26,9 +28,16 @@ export function updateText(text: string): any {
   }
 }
 
-export function registerUser(model: RegisterModel) {
+export function registerUser(user: User) {
   return {
     type: Action.REGISTER_USER,
-    model
+    user
+  }
+}
+
+export function loadSession(session: Session) {
+  return {
+    type: Action.LOAD_SESSION,
+    session
   }
 }

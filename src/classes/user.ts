@@ -9,6 +9,9 @@ interface IRegisterModel {
 }
 
 function validateRegistration(m: IRegisterModel) {
+  if (!m.userName || !m.email || !m.password || !m.confirmPassword) {
+    return 'Invalid request parameters'
+  }
   if (m.userName.length === 0
     || m.email.length === 0
     || m.password.length === 0
@@ -58,7 +61,7 @@ export default class User {
       userName: data.userName,
       email: data.email,
       password: data.password
-    }).ops[0])
+    })).ops[0]
 
     this.id = dbUser._id
     this.userName = dbUser.userName

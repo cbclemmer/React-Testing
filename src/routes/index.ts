@@ -6,9 +6,13 @@ export default (app: any, db: any) => {
     const user = new User()
     await user.load(db, null, req.body)
     const session = new Session()
+    if (!user.error) {
+      await session.load(db, null, user.id)
+    }
     return res.json({
       err: user.error,
-      user
+      user,
+      session
     })
   })
 }
