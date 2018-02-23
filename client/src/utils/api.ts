@@ -1,13 +1,19 @@
 import * as $ from 'jquery'
 import * as toastr from 'toastr'
+import { method } from 'bluebird';
 
-export async function post(url: string, data: any): Promise<any> {
+enum Method {
+  POST = 'POST',
+  GET = 'GET'
+}
+
+async function ajax(type: Method, url: string, data?: any): Promise<any> {
   try {
     const d = await new Promise((res, rej) => {
       $.ajax({
         url,
         data: JSON.stringify(data),
-        type: 'POST',
+        type,
         contentType: 'application/json',
         dataType: 'JSON'
       })
@@ -25,4 +31,12 @@ export async function post(url: string, data: any): Promise<any> {
     console.error(e)
     return false
   }
+}
+
+export function post(url: string, data?: any): Promise<any> {
+  return ajax(Method.POST, url, data)
+}
+
+export function get(url: string, data?: any): Promise<any> {
+  return ajax(Method.GET, url, data)
 }

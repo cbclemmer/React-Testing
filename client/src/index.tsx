@@ -18,6 +18,8 @@ import NoMatch from './pages/noMatch'
 import { BrowserRouter, Link, Route, Switch } from 'react-router-dom'
 import { NativeRouter } from 'react-router-native'
 
+import * as api from './utils/api'
+
 const store = createStore(reducers)
 
 const App = () => (
@@ -35,11 +37,17 @@ const App = () => (
   </div>
 )
 
-render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </Provider>,
-  document.getElementById('app')
-)
+const main = async () => {
+  const authed = await api.get('/user/auth')
+  console.log(authed)
+  render(
+    <Provider store={store}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>,
+    document.getElementById('app')
+  )
+}
+
+main()

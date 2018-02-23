@@ -2,14 +2,14 @@ import * as passport from 'passport'
 import * as passportLocal from 'passport-local'
 import { Db } from 'mongodb'
 import { Express, Request, Response, NextFunction } from 'express-serve-static-core'
-import { pick } from 'lodash'
+import { pick, omit } from 'lodash'
 import User from './classes/user'
 
 const LocalStrategy = passportLocal.Strategy
 
-export default async (db: Db) => {
+export default (db: Db) => {
   passport.use(new LocalStrategy({
-    usernameField: 'email'
+    usernameField: 'email',
   },
   async (email, password, done) => {
     const users = db.collection('User')
@@ -29,11 +29,19 @@ export function authenticate(request: Request, response: Response, next: NextFun
   return new Promise((resolve, reject) => {
     passport.authenticate('local', (err, user, info) => {
       if (err) {
-        throw err
+        return resolve({ error: err })
       }
-      resolve({
-        user: pick(user, ['email', 'userName', '_id']),
-        error: info ? info.message : null
+      if (!user) {
+        return resolve({ error: info.message })
+      }
+      request.login(user, (error: any) => {
+        if (error) {
+          return resolve({ error })
+        }
+        resolve({
+          user: pick(user, ['email', 'userName', '_id']),
+          error: info ? info.message : null
+        })
       })
     })(request, response, next)
   })

@@ -6,7 +6,7 @@ import { Db } from 'mongodb'
 import { authenticate, login } from '../auth'
 
 export default (app: Express, db: Db) => {
-  app.post('/user/auth', async (req: Request, res: Response, next: NextFunction) =>
+  app.get('/user/auth', async (req: Request, res: Response, next: NextFunction) =>
     res.json(await authenticate(req, res, next)))
 
   app.post('/user/register', async (req: Request, res: Response) => {

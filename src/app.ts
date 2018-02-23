@@ -34,8 +34,6 @@ app.use((req, res, next) => {
   next()
 })
 
-app.get(/\/.*/, (req, res) => res.sendFile(clientDir + '/index.html'))
-
 const p = new Promise((res, rej) => {
   mongoClient.connect('mongodb://localhost:27017', (err, client) => {
     if (err) {
@@ -49,6 +47,7 @@ p
 .then((db: mongo.Db) => {
   auth(db)
   routes(app, db)
+  app.get(/\/.*/, (req, res) => res.sendFile(clientDir + '/index.html'))
   server.listen(8080)
   console.log('Server started on port 8080')
 })

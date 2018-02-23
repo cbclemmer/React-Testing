@@ -15,7 +15,7 @@ export default connect(
       if (res.error) {
         return
       }
-      Authenticate(dispatch, history, res)
+      // Authenticate(dispatch, history, res)
     }
   })
 )(Login)
