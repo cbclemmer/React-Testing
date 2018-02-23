@@ -38,7 +38,7 @@ export default combineReducers({
         return state
     }
   },
-  isAuthenticated: (state = false, action) => {
+  isAuthenticated: (state = null, action) => {
     switch (action.type) {
       case Action.LOAD_SESSION:
         return true

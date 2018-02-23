@@ -1,32 +1,32 @@
 import User from '../classes/user'
-import Session from '../classes/session';
+import * as passport from 'passport'
+import { pick } from 'lodash'
+import { Express, Request, Response, NextFunction } from 'express-serve-static-core'
+import { Db } from 'mongodb'
+import { authenticate, login } from '../auth'
 
-export default (app: any, db: any) => {
-  app.post('/user/register', async (req: any, res: any) => {
+export default (app: Express, db: Db) => {
+  app.post('/user/auth', async (req: Request, res: Response, next: NextFunction) =>
+    res.json(await authenticate(req, res, next)))
+
+  app.post('/user/register', async (req: Request, res: Response) => {
     const user = new User()
     await user.load(db, null, req.body)
-    const session = new Session()
-    if (!user.error) {
-      await session.load(db, null, user.id)
+    if (user.error) {
+      return res.json({
+        error: user.error,
+        user
+      })
     }
-    return res.json({
-      err: user.error,
-      user,
-      session
-    })
+    const error = await login(req, user)
+    res.json({ error, user })
   })
 
-  app.post('/user/login', async (req: any, res: any) => {
-    const user = new User()
-    await user.load(db, null, null, req.body)
-    const session = new Session()
-    if (!user.error) {
-      await session.load(db, null, user.id)
-    }
-    return res.json({
-      error: user.error,
-      user,
-      session
-    })
+  app.post('/user/login', async (req: Request, res: Response, next: NextFunction) =>
+    res.json(await authenticate(req, res, next)))
+
+  app.post('/user/signout', async (req: Request, res: Response) => {
+    req.logout()
+    res.json({ err: false })
   })
 }
