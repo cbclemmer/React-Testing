@@ -10,6 +10,13 @@ interface IRegisterModel {
   confirmPassword: string
 }
 
+interface IUserDbSchema {
+  _id: ObjectId,
+  userName: string,
+  email: string,
+  password: string
+}
+
 async function validateRegistration(db: Db, m: IRegisterModel) {
   if (!m.userName || !m.email || !m.password || !m.confirmPassword) {
     return 'Invalid request parameters'
@@ -47,13 +54,13 @@ export default class User {
       return u
     }
     const users = db.collection(Collection.User)
-    const { _id } = (await users.insertOne({
+    const user = (await users.insertOne({
       userName: data.userName,
       email: data.email,
       password: data.password
     })).ops[0]
 
-    await u.load(_id.toString())
+    await u.load(user._id.toString())
     return u
   }
 
@@ -68,6 +75,16 @@ export default class User {
     this.db = db
   }
 
+  public async find(email: string, password: string) {
+    const users = this.db.collection(Collection.User)
+    const user = await users.findOne({ email, password })
+    if (!user) {
+      this.error = 'Incorrect email or password'
+      return
+    }
+    this.fromDbObject(user)
+  }
+
   public async load(id: string) {
     const users = this.db.collection(Collection.User)
     const user = await users.findOne({ _id: new ObjectId(id) })
@@ -75,12 +92,16 @@ export default class User {
       this.error = 'User not found: ' + id
       return
     }
-    this.id = user._id
-    extend(this, pick(user, ['email', 'userName']))
-    this.loaded = true
+    this.fromDbObject(user)
   }
 
   public get safeData(): any {
     return pick(this, ['id', 'userName', 'email'])
+  }
+
+  private fromDbObject(user: any) {
+    this.id = user._id.toString()
+    extend(this, pick(user, ['userName', 'email']))
+    this.loaded = true
   }
 }

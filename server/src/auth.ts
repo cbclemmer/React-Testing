@@ -11,8 +11,8 @@ import Collection from './collections'
 const LocalStrategy = passportLocal.Strategy
 
 export default (db: Db) => {
-  passport.serializeUser(({ _id }, done) => {
-    done(null, _id)
+  passport.serializeUser(({ id }, done) => {
+    done(null, id)
   })
 
   passport.deserializeUser(async (id: string, done) => {
@@ -29,11 +29,11 @@ export default (db: Db) => {
     usernameField: 'email',
   },
   async (email, password, done) => {
-    const users = db.collection(Collection.User)
+    const user = new User(db)
+    await user.find(email, password)
     try {
-      const user = await users.findOne({ email, password })
-      if (!user) {
-        return done(null, false, { message: 'Incorrect email or password' })
+      if (user.error) {
+        return done(null, false, { message: user.error })
       }
       return done(null, user)
     } catch (e) {
@@ -44,7 +44,7 @@ export default (db: Db) => {
 
 export function authenticate(request: Request, response: Response, next: NextFunction): Promise<any> {
   return new Promise((resolve, reject) => {
-    passport.authenticate('local', async (err, user, info) => {
+    passport.authenticate('local', async (err, user: User, info) => {
       if (err) {
         return resolve({ error: err })
       }
@@ -56,7 +56,7 @@ export function authenticate(request: Request, response: Response, next: NextFun
         return resolve({ error })
       }
       resolve({
-        user: pick(user, ['email', 'userName', '_id']),
+        user: user.safeData,
         error: info ? info.message : null
       })
     })(request, response, next)

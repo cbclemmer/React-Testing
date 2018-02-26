@@ -12,7 +12,7 @@ import Login from './containers/login'
 import Nav from './containers/nav'
 
 import Home from './pages/home'
-import User from './pages/user'
+import User from './containers/user'
 import NoMatch from './pages/noMatch'
 
 import { BrowserRouter, Link, Route, Switch } from 'react-router-dom'
@@ -39,7 +39,7 @@ const App = () => (
 )
 
 const main = async () => {
-  const { error, user } = await api.get('/user/auth')
+  const { error, user } = await api.get('/api/user/auth')
   if (!error) {
     store.dispatch(authenticate(user))
   }

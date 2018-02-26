@@ -8,7 +8,16 @@ import User from '../classes/user'
 import { authenticate, login } from '../auth'
 
 export default (app: Express, db: Db) => {
-  app.get('/user/auth', async (req: Request, res: Response, next: NextFunction) => {
+  app.get('/api/user/:id', async (req: Request, res: Response) => {
+    const user = new User(db)
+    await user.load(req.params.id)
+    return res.json({
+      error: user.error,
+      user: user.safeData
+    })
+  })
+
+  app.get('/api/user/auth', async (req: Request, res: Response) => {
     const authed = req.isAuthenticated()
     const user = new User(db)
     if (authed) {
@@ -23,7 +32,7 @@ export default (app: Express, db: Db) => {
     })
   })
 
-  app.post('/user/register', async (req: Request, res: Response) => {
+  app.post('/api/user/register', async (req: Request, res: Response) => {
     const user = await User.create(db, req.body)
     if (user.error) {
       return res.json({
@@ -32,13 +41,13 @@ export default (app: Express, db: Db) => {
       })
     }
     const error = await login(req, user)
-    res.json({ error, user })
+    res.json({ error, user: user.safeData })
   })
 
-  app.post('/user/login', async (req: Request, res: Response, next: NextFunction) =>
+  app.post('/api/user/login', async (req: Request, res: Response, next: NextFunction) =>
     res.json(await authenticate(req, res, next)))
 
-  app.post('/user/logout', async (req: Request, res: Response) => {
+  app.post('/api/user/logout', async (req: Request, res: Response) => {
     req.logout()
     res.json({ error: false })
   })

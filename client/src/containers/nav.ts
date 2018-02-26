@@ -14,7 +14,7 @@ export default connect(
   (dispatch, props) => ({
     signOut: async (e: any, history: any) => {
       e.preventDefault()
-      const { error } = await api.post('user/logout')
+      const { error } = await api.post('/api/user/logout')
       if (error) {
         return
       }
