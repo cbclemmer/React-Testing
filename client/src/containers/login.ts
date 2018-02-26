@@ -4,18 +4,18 @@ import Login, { LoginModel } from '../pages/login'
 import User from '../classes/user'
 import Session from '../classes/session'
 import * as api from '../utils/api'
-import { Authenticate } from '../utils'
+import { authenticate } from '../actions'
 
 export default connect(
   () => ({ }),
   (dispatch, props) => ({
     onSubmit: async (e: React.FormEvent<HTMLFormElement>, model: LoginModel, history: any) => {
       e.preventDefault()
-      const res = await api.post('user/login', model.toStrings())
-      if (res.error) {
+      const { error, user } = await api.post('user/login', model.toStrings())
+      if (error) {
         return
       }
-      // Authenticate(dispatch, history, res)
+      dispatch(authenticate(user))
     }
   })
 )(Login)

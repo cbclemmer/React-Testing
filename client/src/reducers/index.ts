@@ -4,6 +4,24 @@ import User from '../classes/user'
 import Session from '../classes/session'
 
 export default combineReducers({
+  isAuthenticated: (state = null, { type }) => {
+    switch (type) {
+      case Action.AUTHENTICATE:
+        return true
+      default:
+        return state
+    }
+  },
+  user: (state = new User(), { type, user }) => {
+    switch (type) {
+      case Action.AUTHENTICATE:
+        return user
+      default:
+        return state
+    }
+  },
+
+  // OLD ---------------------------------------
   counter: (state = 0, action) => {
     switch (action.type) {
       case 'INCREMENT':
@@ -22,26 +40,11 @@ export default combineReducers({
         return state
     }
   },
-  user: (state = new User(), action) => {
-    switch (action.type) {
-      case Action.LOAD_USER:
-        return action.user
-      default:
-        return state
-    }
-  },
+
   session: (state = new Session(), action) => {
     switch (action.type) {
       case Action.LOAD_SESSION:
         return action.session
-      default:
-        return state
-    }
-  },
-  isAuthenticated: (state = null, action) => {
-    switch (action.type) {
-      case Action.LOAD_SESSION:
-        return true
       default:
         return state
     }

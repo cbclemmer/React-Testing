@@ -2,20 +2,27 @@ import User from '../classes/user'
 import Session from '../classes/session'
 
 export enum Action {
+  AUTHENTICATE,
+
   LOAD_USER,
   LOAD_SESSION
 }
 
-export interface IAction {
-  type: string
+export function authenticate(user: User) {
+  return {
+    type: Action.AUTHENTICATE,
+    user
+  }
 }
 
-export function increment(): IAction {
+// OLD --------------------------------
+
+export function increment() {
   return {
     type: 'INCREMENT'
   }
 }
-export function decrement(): IAction {
+export function decrement() {
   return {
     type: 'DECREMENT'
   }

@@ -4,6 +4,7 @@ import { Db, ObjectId } from 'mongodb'
 import { Express, Request, Response, NextFunction } from 'express-serve-static-core'
 import { pick, omit } from 'lodash'
 import User from './classes/user'
+import Collection from './collections'
 
 const LocalStrategy = passportLocal.Strategy
 
@@ -13,7 +14,7 @@ export default (db: Db) => {
   })
 
   passport.deserializeUser(async (id: string, done) => {
-    const users = db.collection('User')
+    const users = db.collection(Collection.User)
     try {
       const user = await users.findOne({ _id: new ObjectId(id) })
       done(null, user)
@@ -26,7 +27,7 @@ export default (db: Db) => {
     usernameField: 'email',
   },
   async (email, password, done) => {
-    const users = db.collection('User')
+    const users = db.collection(Collection.User)
     try {
       const user = await users.findOne({ email, password })
       if (!user) {

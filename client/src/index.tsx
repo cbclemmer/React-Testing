@@ -19,6 +19,7 @@ import { BrowserRouter, Link, Route, Switch } from 'react-router-dom'
 import { NativeRouter } from 'react-router-native'
 
 import * as api from './utils/api'
+import { authenticate } from './actions'
 
 const store = createStore(reducers)
 
@@ -38,7 +39,10 @@ const App = () => (
 )
 
 const main = async () => {
-  const authed = await api.get('/user/auth')
+  const { error, user } = await api.get('/user/auth')
+  if (!error) {
+    store.dispatch(authenticate(user))
+  }
   render(
     <Provider store={store}>
       <BrowserRouter>

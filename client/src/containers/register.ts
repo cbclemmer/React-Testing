@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { loadUser, loadSession } from '../actions'
+import { authenticate } from '../actions'
 import Register, { RegisterModel } from '../pages/register'
 import User from '../classes/user'
 import Session from '../classes/session'
@@ -11,11 +11,11 @@ export default connect(
   (dispatch, props) => ({
     onSubmit: async (e: React.FormEvent<HTMLFormElement>, model: RegisterModel, history: any) => {
       e.preventDefault()
-      const res = await api.post('user/register', model.toStrings())
-      if (res.error) {
+      const { error, user } = await api.post('user/register', model.toStrings())
+      if (error) {
         return
       }
-      Authenticate(dispatch, history, res)
+      dispatch(authenticate(user))
     }
   })
 )(Register)

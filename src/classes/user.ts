@@ -1,5 +1,6 @@
 import Collection from '../collections'
-import { extend } from 'lodash'
+import { extend, pick } from 'lodash'
+import { Db, ObjectId } from 'mongodb'
 
 interface IRegisterModel {
   userName: string
@@ -33,56 +34,48 @@ function validateRegistration(m: IRegisterModel) {
 }
 
 export default class User {
-  public id: string
-  public userName: string
-  public email: string
-  public password: string
-  public error: string
-
-  public async load(db: any, id: string, regData: IRegisterModel = null, loginData: ILoginModel = null) {
-    if (id === null) {
-      if (regData !== null) {
-        await this.createUser(db, regData)
-      }
-      if (loginData !== null) {
-        await this.authenticateUser(db, loginData)
-      }
-    } else {
-      await this.loadUser(id, db)
-    }
-  }
-
-  private async authenticateUser(db: any, data: ILoginModel) {
-    const users = db.collection(Collection.User)
-    const dbUser = await users.findOne({ email: data.email, password: data.password })
-    if (!dbUser) {
-      this.error = 'Email or password is incorrect'
-      return
-    }
-    this.id = dbUser._id
-    extend(this, dbUser)
-  }
-
-  private async loadUser(id: string, db: any) {
-    const users = db.collection(Collection.User)
-    const dbUser = await users.findOne({ _id: id })
-    console.log(dbUser)
-  }
-
-  private async createUser(db: any, data: IRegisterModel) {
+  public static async create(db: Db, data: IRegisterModel): Promise<User> {
     const error = validateRegistration(data)
+    const u = new User(db)
     if (error) {
-      this.error = error
-      return
+      u.error = error
+      return u
     }
     const users = db.collection(Collection.User)
-    const dbUser = (await users.insertOne({
+    const { _id } = (await users.insertOne({
       userName: data.userName,
       email: data.email,
       password: data.password
     })).ops[0]
 
-    this.id = dbUser._id
-    extend(this, dbUser)
+    await u.load(_id.toString())
+    return u
+  }
+
+  public id: string
+  public userName: string
+  public email: string
+  public error: string
+  public loaded: boolean = false
+  private db: Db
+
+  constructor(db: Db) {
+    this.db = db
+  }
+
+  public async load(id: string) {
+    const users = this.db.collection(Collection.User)
+    const user = await users.findOne({ _id: new ObjectId(id) })
+    if (!user) {
+      this.error = 'User not found: ' + id
+      return
+    }
+    this.id = user._id
+    extend(this, pick(user, ['email', 'userName']))
+    this.loaded = true
+  }
+
+  public get safeData(): any {
+    return pick(this, ['id', 'userName', 'email'])
   }
 }

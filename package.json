@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "compile": "tsc && echo compilation complete",
-    "serve": "yarn run compile && node dist/app"
+    "serve": "yarn run compile && node dist/app",
+    "go": "node dist/app"
   },
   "dependencies": {
     "@types/bluebird": "^3.5.20",
