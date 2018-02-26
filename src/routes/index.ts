@@ -38,6 +38,6 @@ export default (app: Express, db: Db) => {
 
   app.post('/user/signout', async (req: Request, res: Response) => {
     req.logout()
-    res.json({ err: false })
+    res.json({ error: false })
   })
 }

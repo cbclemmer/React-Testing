@@ -8,6 +8,8 @@ export default combineReducers({
     switch (type) {
       case Action.AUTHENTICATE:
         return true
+      case Action.SIGNOUT:
+        return false
       default:
         return state
     }
@@ -16,6 +18,8 @@ export default combineReducers({
     switch (type) {
       case Action.AUTHENTICATE:
         return user
+      case Action.SIGNOUT:
+        return new User()
       default:
         return state
     }
