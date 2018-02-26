@@ -1,8 +1,10 @@
-import User from '../classes/user'
 import * as passport from 'passport'
-import { pick } from 'lodash'
+
 import { Express, Request, Response, NextFunction } from 'express-serve-static-core'
+import { pick } from 'lodash'
 import { Db } from 'mongodb'
+
+import User from '../classes/user'
 import { authenticate, login } from '../auth'
 
 export default (app: Express, db: Db) => {
@@ -36,7 +38,7 @@ export default (app: Express, db: Db) => {
   app.post('/user/login', async (req: Request, res: Response, next: NextFunction) =>
     res.json(await authenticate(req, res, next)))
 
-  app.post('/user/signout', async (req: Request, res: Response) => {
+  app.post('/user/logout', async (req: Request, res: Response) => {
     req.logout()
     res.json({ error: false })
   })

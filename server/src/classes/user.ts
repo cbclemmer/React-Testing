@@ -1,6 +1,7 @@
-import Collection from '../collections'
 import { extend, pick } from 'lodash'
 import { Db, ObjectId } from 'mongodb'
+
+import Collection from '../collections'
 
 interface IRegisterModel {
   userName: string
@@ -9,12 +10,7 @@ interface IRegisterModel {
   confirmPassword: string
 }
 
-interface ILoginModel {
-  email: string
-  password: string
-}
-
-function validateRegistration(m: IRegisterModel) {
+async function validateRegistration(db: Db, m: IRegisterModel) {
   if (!m.userName || !m.email || !m.password || !m.confirmPassword) {
     return 'Invalid request parameters'
   }
@@ -30,12 +26,21 @@ function validateRegistration(m: IRegisterModel) {
   if (m.password.length < 8) {
     return 'Password must be at least 8 characters'
   }
+  const users = db.collection(Collection.User)
+  const emailUser = await users.findOne({ email: m.email })
+  if (emailUser) {
+    return 'Email is already taken'
+  }
+  const userNameUser = await users.findOne({ userName: m.userName })
+  if (userNameUser) {
+    return 'Username is already taken'
+  }
   return null
 }
 
 export default class User {
   public static async create(db: Db, data: IRegisterModel): Promise<User> {
-    const error = validateRegistration(data)
+    const error = await validateRegistration(db, data)
     const u = new User(db)
     if (error) {
       u.error = error

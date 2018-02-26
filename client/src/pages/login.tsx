@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Route } from 'react-router-dom'
+import { FormGroup, Input, Button } from 'reactstrap'
 
 export class LoginModel {
   public email: HTMLInputElement
@@ -19,19 +20,19 @@ export default (props: any) => {
   return (
     <Route render={(ctx: any) => (
       <form onSubmit={(e) => props.onSubmit(e, page, ctx.history)}>
-        <div className="form-group">
+        <FormGroup>
           <label>Email</label>
           <input ref={(node) => { page.email = node }} type="email" className="form-control" placeholder="Email..." />
-        </div>
-        <div className="form-group">
+        </FormGroup>
+        <FormGroup>
           <label>Password</label>
           <input ref={(node) => { page.password = node }} type="password" className="form-control" placeholder="Password..." />
-        </div>
-        <div className="form-group">
-          <button className="btn btn-primary" type="submit">
+        </FormGroup>
+        <FormGroup>
+          <Button color="primary" type="submit">
             Submit
-          </button>
-        </div>
+          </Button>
+        </FormGroup>
       </form>
     )} />
   )

@@ -1,10 +1,11 @@
+import * as toastr from 'toastr'
+
 import { connect } from 'react-redux'
-import { authenticate } from '../actions'
-import Register, { RegisterModel } from '../pages/register'
+
 import User from '../classes/user'
-import Session from '../classes/session'
-import { Authenticate } from '../utils/'
 import * as api from '../utils/api'
+import Register, { RegisterModel } from '../pages/register'
+import { authenticate } from '../actions'
 
 export default connect(
   () => ({ }),
@@ -15,7 +16,10 @@ export default connect(
       if (error) {
         return
       }
-      dispatch(authenticate(user))
+      const u = new User(user._id, user.userName, user.email)
+      dispatch(authenticate(u))
+      toastr.success('Reigstered User')
+      history.push('/users/' + u.id)
     }
   })
 )(Register)

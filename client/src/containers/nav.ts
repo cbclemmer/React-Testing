@@ -1,7 +1,10 @@
+import * as toastr from 'toastr'
+
 import { connect } from 'react-redux'
-import { signOut } from '../actions'
+
 import Nav from '../page-partials/nav'
 import * as api from '../utils/api'
+import { logout } from '../actions'
 
 export default connect(
   (state: any) => ({
@@ -9,13 +12,15 @@ export default connect(
     userId: state.user.id
   }),
   (dispatch, props) => ({
-    signOut: async (e: any) => {
+    signOut: async (e: any, history: any) => {
       e.preventDefault()
-      const { error } = await api.post('user/signout')
+      const { error } = await api.post('user/logout')
       if (error) {
         return
       }
-      dispatch(signOut())
+      history.push('/')
+      toastr.success('Logged Out')
+      dispatch(logout())
     }
   })
 )(Nav)

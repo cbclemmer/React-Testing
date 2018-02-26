@@ -1,8 +1,10 @@
 import * as passport from 'passport'
 import * as passportLocal from 'passport-local'
+
 import { Db, ObjectId } from 'mongodb'
 import { Express, Request, Response, NextFunction } from 'express-serve-static-core'
 import { pick, omit } from 'lodash'
+
 import User from './classes/user'
 import Collection from './collections'
 

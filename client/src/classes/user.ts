@@ -1,5 +1,3 @@
-import { RegisterModel } from '../pages/register'
-
 export default class User {
   public id: string
   public userName: string

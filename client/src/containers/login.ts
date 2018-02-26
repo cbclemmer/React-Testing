@@ -1,10 +1,11 @@
+import * as toastr from 'toastr'
+
 import { connect } from 'react-redux'
-import { loadUser, loadSession } from '../actions'
-import Login, { LoginModel } from '../pages/login'
+
 import User from '../classes/user'
-import Session from '../classes/session'
 import * as api from '../utils/api'
 import { authenticate } from '../actions'
+import Login, { LoginModel } from '../pages/login'
 
 export default connect(
   () => ({ }),
@@ -15,7 +16,10 @@ export default connect(
       if (error) {
         return
       }
-      dispatch(authenticate(user))
+      const u = new User(user._id, user.userName, user.email)
+      dispatch(authenticate(u))
+      toastr.success('Logged In')
+      history.push('/user/' + u.id)
     }
   })
 )(Login)
