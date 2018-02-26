@@ -26,14 +26,14 @@ const store = createStore(reducers)
 const App = () => (
   <div>
     <Nav />
-    <div>
-      <Switch>
-        <Route exact path="/" component={Home} />
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Register} />
-        <Route path="/user/:id" component={User}/>
-        <Route component={NoMatch} />
-      </Switch>
+    <div className="container">
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          <Route path="/user/:id" component={User}/>
+          <Route component={NoMatch} />
+        </Switch>
     </div>
   </div>
 )
