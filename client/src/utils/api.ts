@@ -19,7 +19,10 @@ async function ajax(type: Method, url: string, data?: any): Promise<any> {
       })
       .done((response) => {
         if (response.error) {
-          toastr.error(response.error)
+          const reg = /.*auth.*/
+          if (!reg.test(url)) {
+            toastr.error(response.error)
+          }
         }
         res(response)
       })

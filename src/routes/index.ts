@@ -7,7 +7,7 @@ import { authenticate, login } from '../auth'
 
 export default (app: Express, db: Db) => {
   app.get('/user/auth', async (req: Request, res: Response, next: NextFunction) =>
-    res.json(await authenticate(req, res, next)))
+    res.json(req.isAuthenticated()))
 
   app.post('/user/register', async (req: Request, res: Response) => {
     const user = new User()

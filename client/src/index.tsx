@@ -39,7 +39,6 @@ const App = () => (
 
 const main = async () => {
   const authed = await api.get('/user/auth')
-  console.log(authed)
   render(
     <Provider store={store}>
       <BrowserRouter>
