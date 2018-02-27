@@ -1,11 +1,11 @@
-import { combineReducers } from 'redux'
-import actions, { Action } from '../actions'
+import { combineReducers, ReducersMapObject } from 'redux'
+import { extend } from 'lodash'
+
+import { Action } from '../actions'
 import User from '../classes/user'
-import { UserPage } from '../containers/user'
+import { reducers as userPageReducers } from '../containers/user'
 
-const userPage = actions.userPage
-
-export default combineReducers({
+const globalReducers: ReducersMapObject = {
   isAuthenticated: (state = null, { type }) => {
     switch (type) {
       case Action.AUTHENTICATE:
@@ -25,14 +25,10 @@ export default combineReducers({
       default:
         return state
     }
-  },
-  userPage: (state = new UserPage(), { type, user }) => {
-    switch (type) {
-      case userPage.types.LOAD:
-        state.load(user)
-        return state
-      default:
-        return state
-    }
   }
-})
+}
+
+export default combineReducers(extend(
+  globalReducers,
+  userPageReducers
+))

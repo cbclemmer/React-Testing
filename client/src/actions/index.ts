@@ -1,9 +1,8 @@
 import User, { IAPIUser } from '../classes/user'
-import userPage from './user'
 
 export enum Action {
-  AUTHENTICATE,
-  LOGOUT
+  AUTHENTICATE = 'AUTHENTICATE',
+  LOGOUT = 'LOGOUT'
 }
 
 export function authenticate(user: User) {
@@ -17,12 +16,4 @@ export function logout() {
   return {
     type: Action.LOGOUT
   }
-}
-
-export default {
-  Action,
-  authenticate,
-  logout,
-
-  userPage
 }
