@@ -11,7 +11,7 @@ interface IRegisterModel {
 }
 
 interface IUserDbSchema {
-  _id: ObjectId,
+  _id?: ObjectId,
   userName: string,
   email: string,
   password: string
@@ -53,15 +53,22 @@ export default class User {
       u.error = error
       return u
     }
-    const users = db.collection(Collection.User)
-    const user = (await users.insertOne({
+    const user = await this.createDb(db, {
       userName: data.userName,
       email: data.email,
       password: data.password
-    })).ops[0]
+    })
 
     await u.load(user._id.toString())
     return u
+  }
+
+  public static async createDb(db: Db, data: IUserDbSchema) {
+    delete data._id
+    if (!data.email || !data.password || !data.userName) {
+      throw 'Incorrect data for creating user'
+    }
+    return (await db.collection(Collection.User).insertOne(data)).ops[0]
   }
 
   public id: string

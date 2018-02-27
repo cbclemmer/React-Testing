@@ -8,7 +8,7 @@ import User from '../classes/user'
 import { authenticate, login } from '../auth'
 
 export default (app: Express, db: Db) => {
-  app.get('/api/user/:id', async (req: Request, res: Response) => {
+  app.get('/api/users/:id', async (req: Request, res: Response) => {
     const user = new User(db)
     await user.load(req.params.id)
     return res.json({
