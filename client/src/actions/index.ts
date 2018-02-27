@@ -1,4 +1,4 @@
-import User from '../classes/user'
+import User, { IAPIUser } from '../classes/user'
 
 export enum Action {
   AUTHENTICATE,
@@ -15,5 +15,27 @@ export function authenticate(user: User) {
 export function logout() {
   return {
     type: Action.LOGOUT
+  }
+}
+
+enum userPageAction {
+  LOAD
+}
+
+const userPage = {
+  load: (user: IAPIUser) => ({
+    type: userPageAction.LOAD,
+    user
+  })
+}
+
+export default {
+  Action,
+  authenticate,
+  logout,
+
+  userPage: {
+    types: userPageAction,
+    actions: userPage
   }
 }

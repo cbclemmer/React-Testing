@@ -1,4 +1,4 @@
-interface IAPIUser {
+export interface IAPIUser {
   id: string,
   userName: string,
   email: string
