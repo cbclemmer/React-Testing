@@ -1,4 +1,5 @@
 import User, { IAPIUser } from '../classes/user'
+import userPage from './user'
 
 export enum Action {
   AUTHENTICATE,
@@ -18,24 +19,10 @@ export function logout() {
   }
 }
 
-enum userPageAction {
-  LOAD
-}
-
-const userPage = {
-  load: (user: IAPIUser) => ({
-    type: userPageAction.LOAD,
-    user
-  })
-}
-
 export default {
   Action,
   authenticate,
   logout,
 
-  userPage: {
-    types: userPageAction,
-    actions: userPage
-  }
+  userPage
 }
