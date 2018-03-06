@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as toastr from 'toastr'
 import { connect } from 'react-redux'
 
 import User from '../../classes/user'
@@ -7,7 +8,7 @@ import template from './template'
 
 class UserPageState {
   public user: User = null
-  public value: string = ''
+  public contents: string = ''
   public loaded: boolean = false
   public isSelf: boolean = false
 }
@@ -35,7 +36,12 @@ export class UserPage extends React.Component {
   }
 
   public handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-    this.setState({ value: event.target.value})
+    this.setState({ contents: event.target.value })
+  }
+
+  public async sendTweet() {
+    await api.post('/api/tweets/create', { contents: this.state.contents })
+    toastr.success('Tweeted')
   }
 
   public render() {

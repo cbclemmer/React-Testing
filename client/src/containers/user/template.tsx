@@ -7,7 +7,7 @@ const tweetForm = (page: UserPage) =>
   <div>
     <textarea onChange={page.handleChange.bind(page)} className="form-control"></textarea>
     <br />
-    <Button color="primary">
+    <Button color="primary" onClick={page.sendTweet.bind(page)}>
       Send Tweet
     </Button>
   </div>
