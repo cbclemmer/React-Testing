@@ -12,7 +12,9 @@
         "object-literal-sort-keys": [false],
         "max-line-length": [false],
         "ordered-imports": [false],
-        "no-unused-variable": [true]
+        "no-string-throw": [false],
+        "no-unused-variable": [true],
+        "max-classes-per-file": [false]
     },
     "rulesDirectory": []
 }

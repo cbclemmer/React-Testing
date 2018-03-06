@@ -1,8 +1,10 @@
-import { combineReducers } from 'redux'
+import { combineReducers, ReducersMapObject } from 'redux'
+import { extend } from 'lodash'
+
 import { Action } from '../actions'
 import User from '../classes/user'
 
-export default combineReducers({
+const globalReducers: ReducersMapObject = {
   isAuthenticated: (state = null, { type }) => {
     switch (type) {
       case Action.AUTHENTICATE:
@@ -23,4 +25,6 @@ export default combineReducers({
         return state
     }
   }
-})
+}
+
+export default combineReducers(globalReducers)

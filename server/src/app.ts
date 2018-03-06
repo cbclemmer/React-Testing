@@ -7,6 +7,7 @@ import * as passport from 'passport'
 import { Server } from 'http'
 import { resolve } from 'path'
 
+import Procedures from './procedures'
 import routes from './routes'
 import auth from './auth'
 import config from './config'
@@ -18,10 +19,11 @@ const { app, server } = config()
 const main = async () => {
   try {
     const client = await mongoClient.connect('mongodb://localhost:27017')
-    const db = client.db('twitter')
+    const db: mongo.Db = client.db('twitter')
 
-    auth(db)
-    routes(app, db)
+    const procedures = new Procedures(db)
+    auth(procedures)
+    routes(app, procedures)
 
     app.get(/\/.*/, (req, res) => res.sendFile(clientDir + '/index.html'))
 

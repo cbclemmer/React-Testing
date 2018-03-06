@@ -7,19 +7,19 @@ import { pick, omit } from 'lodash'
 
 import User from './classes/user'
 import Collection from './collections'
+import Procedures from './procedures'
 
 const LocalStrategy = passportLocal.Strategy
 
-export default (db: Db) => {
-  passport.serializeUser(({ _id }, done) => {
-    done(null, _id)
+export default (procedures: Procedures) => {
+  passport.serializeUser(({ id }, done) => {
+    done(null, id)
   })
 
   passport.deserializeUser(async (id: string, done) => {
-    const users = db.collection(Collection.User)
     try {
-      const user = await users.findOne({ _id: new ObjectId(id) })
-      done(null, user)
+      const user = await procedures.user_get_dbId(id)
+      return done(null, user)
     } catch (e) {
       done(e, null)
     }
@@ -29,22 +29,18 @@ export default (db: Db) => {
     usernameField: 'email',
   },
   async (email, password, done) => {
-    const users = db.collection(Collection.User)
-    try {
-      const user = await users.findOne({ email, password })
-      if (!user) {
-        return done(null, false, { message: 'Incorrect email or password' })
-      }
-      return done(null, user)
-    } catch (e) {
-      return done(e)
+    const user = new User(procedures)
+    await user.find(email, password)
+    if (user.error) {
+      return done(null, false, { message: user.error })
     }
+    return done(null, user)
   }))
 }
 
 export function authenticate(request: Request, response: Response, next: NextFunction): Promise<any> {
   return new Promise((resolve, reject) => {
-    passport.authenticate('local', async (err, user, info) => {
+    passport.authenticate('local', async (err, user: User, info) => {
       if (err) {
         return resolve({ error: err })
       }
@@ -56,7 +52,7 @@ export function authenticate(request: Request, response: Response, next: NextFun
         return resolve({ error })
       }
       resolve({
-        user: pick(user, ['email', 'userName', '_id']),
+        user: user.safeData,
         error: info ? info.message : null
       })
     })(request, response, next)

@@ -1,8 +1,8 @@
-import User from '../classes/user'
+import User, { IAPIUser } from '../classes/user'
 
 export enum Action {
-  AUTHENTICATE,
-  LOGOUT
+  AUTHENTICATE = 'AUTHENTICATE',
+  LOGOUT = 'LOGOUT'
 }
 
 export function authenticate(user: User) {
