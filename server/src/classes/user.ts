@@ -1,7 +1,7 @@
-import { extend, pick } from 'lodash'
+import { extend, pick, noop } from 'lodash'
 import { Db, ObjectId } from 'mongodb'
 
-import Collection from '../collections'
+import Procedures, { IUserSchema } from '../procedures'
 
 interface IRegisterModel {
   userName: string
@@ -10,14 +10,13 @@ interface IRegisterModel {
   confirmPassword: string
 }
 
-interface IUserDbSchema {
-  _id?: ObjectId,
+export interface IUserSafeData {
+  id: string,
   userName: string,
-  email: string,
-  password: string
+  email: string
 }
 
-async function validateRegistration(db: Db, m: IRegisterModel) {
+async function validateRegistration(procedures: Procedures, m: IRegisterModel) {
   if (!m.userName || !m.email || !m.password || !m.confirmPassword) {
     return 'Invalid request parameters'
   }
@@ -33,27 +32,34 @@ async function validateRegistration(db: Db, m: IRegisterModel) {
   if (m.password.length < 8) {
     return 'Password must be at least 8 characters'
   }
-  const users = db.collection(Collection.User)
-  const emailUser = await users.findOne({ email: m.email })
-  if (emailUser) {
+
+  // If we find either one, error out
+  try {
+    await procedures.user_get_byEmail(m.email)
     return 'Email is already taken'
+  } catch (e) {
+    noop()
   }
-  const userNameUser = await users.findOne({ userName: m.userName })
-  if (userNameUser) {
-    return 'Username is already taken'
+
+  try {
+    await procedures.user_get_byUserName(m.userName)
+    return 'Username already taken'
+  } catch (e) {
+    noop()
   }
+
   return null
 }
 
 export default class User {
-  public static async create(db: Db, data: IRegisterModel): Promise<User> {
-    const error = await validateRegistration(db, data)
-    const u = new User(db)
+  public static async create(procedures: Procedures, data: IRegisterModel): Promise<User> {
+    const error = await validateRegistration(procedures, data)
+    const u = new User(procedures)
     if (error) {
       u.error = error
       return u
     }
-    const user = await this.createDb(db, {
+    const user = await procedures.user_post_create({
       userName: data.userName,
       email: data.email,
       password: data.password
@@ -63,50 +69,38 @@ export default class User {
     return u
   }
 
-  public static async createDb(db: Db, data: IUserDbSchema) {
-    delete data._id
-    if (!data.email || !data.password || !data.userName) {
-      throw 'Incorrect data for creating user'
-    }
-    return (await db.collection(Collection.User).insertOne(data)).ops[0]
-  }
-
   public id: string
   public userName: string
   public email: string
   public error: string
   public loaded: boolean = false
-  private db: Db
+  private procedures: Procedures
 
-  constructor(db: Db) {
-    this.db = db
+  constructor(procedures: Procedures) {
+    this.procedures = procedures
   }
 
   public async find(email: string, password: string) {
-    const users = this.db.collection(Collection.User)
-    const user = await users.findOne({ email, password })
-    if (!user) {
-      this.error = 'Incorrect email or password'
-      return
+    try {
+      this.fromDbObject(await this.procedures.user_get_auth(email, password))
+    } catch (error) {
+      this.error = error
     }
-    this.fromDbObject(user)
   }
 
   public async load(id: string) {
-    const users = this.db.collection(Collection.User)
-    const user = await users.findOne({ _id: new ObjectId(id) })
-    if (!user) {
-      this.error = 'User not found: ' + id
-      return
+    try {
+      this.fromDbObject(await this.procedures.user_get_dbId(id))
+    } catch (error) {
+      this.error = error
     }
-    this.fromDbObject(user)
   }
 
-  public get safeData(): any {
+  public get safeData(): IUserSafeData {
     return pick(this, ['id', 'userName', 'email'])
   }
 
-  private fromDbObject(user: any) {
+  private fromDbObject(user: IUserSchema): void {
     this.id = user._id.toString()
     extend(this, pick(user, ['userName', 'email']))
     this.loaded = true

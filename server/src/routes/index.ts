@@ -6,10 +6,11 @@ import { Db } from 'mongodb'
 
 import User from '../classes/user'
 import { authenticate, login } from '../auth'
+import Procedures from '../procedures'
 
-export default (app: Express, db: Db) => {
+export default (app: Express, procedures: Procedures) => {
   app.get('/api/users/:id', async (req: Request, res: Response) => {
-    const user = new User(db)
+    const user = new User(procedures)
     await user.load(req.params.id)
     return res.json({
       error: user.error,
@@ -19,7 +20,7 @@ export default (app: Express, db: Db) => {
 
   app.get('/api/user/auth', async (req: Request, res: Response) => {
     const authed = req.isAuthenticated()
-    const user = new User(db)
+    const user = new User(procedures)
     if (authed) {
       const id = req.user._id.toString()
       await user.load(id)
@@ -33,7 +34,7 @@ export default (app: Express, db: Db) => {
   })
 
   app.post('/api/user/register', async (req: Request, res: Response) => {
-    const user = await User.create(db, req.body)
+    const user = await User.create(procedures, req.body)
     if (user.error) {
       return res.json({
         error: user.error,

@@ -7,19 +7,19 @@ import { pick, omit } from 'lodash'
 
 import User from './classes/user'
 import Collection from './collections'
+import Procedures from './procedures'
 
 const LocalStrategy = passportLocal.Strategy
 
-export default (db: Db) => {
+export default (procedures: Procedures) => {
   passport.serializeUser(({ id }, done) => {
     done(null, id)
   })
 
   passport.deserializeUser(async (id: string, done) => {
-    const users = db.collection(Collection.User)
     try {
-      const user = await users.findOne({ _id: new ObjectId(id) })
-      done(null, user)
+      const user = await procedures.user_get_dbId(id)
+      return done(null, user)
     } catch (e) {
       done(e, null)
     }
@@ -29,16 +29,12 @@ export default (db: Db) => {
     usernameField: 'email',
   },
   async (email, password, done) => {
-    const user = new User(db)
+    const user = new User(procedures)
     await user.find(email, password)
-    try {
-      if (user.error) {
-        return done(null, false, { message: user.error })
-      }
-      return done(null, user)
-    } catch (e) {
-      return done(e)
+    if (user.error) {
+      return done(null, false, { message: user.error })
     }
+    return done(null, user)
   }))
 }
 
