@@ -10,7 +10,8 @@ import template from './template'
 import { createStore, combineReducers, AnyAction } from 'redux'
 
 enum Types {
-  LOAD = 'USER_PAGE_LOAD'
+  LOAD = 'USER_PAGE_LOAD',
+  UPDATE_TWEET = 'USER_PAGE_UPDATE_TWEET'
 }
 
 const actions = {
@@ -40,22 +41,6 @@ export const reducers: ReducersMapObject = {
 }
 
 export default connect(
-  (state: any, props: any) => {
-      return {
-        userID: state.user.id,
-        loaded: state.userPage_loaded,
-        userName: state.userPage_userName,
-        isSelf: state.user.id === props.match.params.id
-      }
-    },
-  (dispatch, props: any) => ({
-    load: async () => {
-      const { error, user } = await api.get('/api/users/' + props.match.params.id)
-      if (error) {
-        return props.history.push('/404')
-      }
-      const u = new User(user)
-      dispatch(actions.load(u))
-    }
-  })
+  (state: any, props: any) => ({ userID: state.user.id }),
+  (dispatch, props: any) => ({ })
 )(template)
