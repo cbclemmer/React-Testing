@@ -4,17 +4,19 @@ import { Link } from 'react-router-dom'
 import User from '../../classes/user'
 import * as api from '../../utils/api'
 
-const header = (props: any) =>
+const tweetForm = (props: any) =>
   <div>
-    <Link to={'/user/' + props.match.params.id}>@{props.userName}</Link>
+    <textarea className="form-control"></textarea>
   </div>
 
 export default (props: any) => {
   props.load()
-  return (
+  console.log(props.isSelf)
+  return props.loaded ? (
     <div>
-      {props.loaded ? header(props) : ''}
-      <p>This is the users page id: {props.match.params.id} </p>
+      <Link to={'/user/' + props.match.params.id}>@{props.userName}</Link>
+      <br />
+      {props.isSelf ? tweetForm(props) : ''}
     </div>
-  )
+  ) : <span></span>
 }

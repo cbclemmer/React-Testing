@@ -40,10 +40,14 @@ export const reducers: ReducersMapObject = {
 }
 
 export default connect(
-  (state: any) => ({
-    loaded: state.userPage_loaded,
-    userName: state.userPage_userName
-  }),
+  (state: any, props: any) => {
+      return {
+        userID: state.user.id,
+        loaded: state.userPage_loaded,
+        userName: state.userPage_userName,
+        isSelf: state.user.id === props.match.params.id
+      }
+    },
   (dispatch, props: any) => ({
     load: async () => {
       const { error, user } = await api.get('/api/users/' + props.match.params.id)
