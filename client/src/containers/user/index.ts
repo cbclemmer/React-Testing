@@ -1,46 +1,49 @@
-import { ReducersMapObject } from 'redux'
+import * as React from 'react'
 import { connect } from 'react-redux'
-import { extend, pick } from 'lodash'
 
-import User, { IAPIUser } from '../../classes/user'
+import User from '../../classes/user'
 import * as api from '../../utils/api'
-import { logout } from '../../actions'
 import template from './template'
 
-import { createStore, combineReducers, AnyAction } from 'redux'
-
-enum Types {
-  LOAD = 'USER_PAGE_LOAD',
-  UPDATE_TWEET = 'USER_PAGE_UPDATE_TWEET'
+class UserPageState {
+  public user: User = null
+  public value: string = ''
+  public loaded: boolean = false
+  public isSelf: boolean = false
 }
 
-const actions = {
-  load: (user: IAPIUser) => ({
-    type: Types.LOAD,
-    user
-  })
-}
+export class UserPage extends React.Component {
+  public props: any
+  public state: UserPageState = new UserPageState()
 
-export const reducers: ReducersMapObject = {
-  userPage_userName: (state: string = '', { type, user }) => {
-    switch (type) {
-      case Types.LOAD:
-        return user.userName
-      default:
-        return state
+  constructor(props: any) {
+    super(props)
+    this.props = props
+    this.load()
+  }
+
+  public async load() {
+    const { error, user } = await api.get('/api/users/' + this.props.match.params.id)
+    if (error) {
+      return this.props.history.push('/404')
     }
-  },
-  userPage_loaded: (state: boolean = false, { type, user }) => {
-    switch (type) {
-      case Types.LOAD:
-        return true
-      default:
-        return state
-    }
+    this.setState({
+      loaded: true,
+      user: new User(user),
+      isSelf: user.id === this.props.userID
+    })
+  }
+
+  public handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+    this.setState({ value: event.target.value})
+  }
+
+  public render() {
+    return template(this)
   }
 }
 
 export default connect(
-  (state: any, props: any) => ({ userID: state.user.id }),
-  (dispatch, props: any) => ({ })
-)(template)
+  (state: any) => ({ userID: state.user.id }),
+  () => ({ })
+)(UserPage)

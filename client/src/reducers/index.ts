@@ -3,7 +3,6 @@ import { extend } from 'lodash'
 
 import { Action } from '../actions'
 import User from '../classes/user'
-import { reducers as userPageReducers } from '../containers/user'
 
 const globalReducers: ReducersMapObject = {
   isAuthenticated: (state = null, { type }) => {
@@ -28,7 +27,4 @@ const globalReducers: ReducersMapObject = {
   }
 }
 
-export default combineReducers(extend(
-  globalReducers,
-  userPageReducers
-))
+export default combineReducers(globalReducers)
