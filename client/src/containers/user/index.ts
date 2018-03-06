@@ -52,7 +52,7 @@ export default connect(
     load: async () => {
       const { error, user } = await api.get('/api/users/' + props.match.params.id)
       if (error) {
-        return
+        return props.history.push('/404')
       }
       const u = new User(user)
       dispatch(actions.load(u))
