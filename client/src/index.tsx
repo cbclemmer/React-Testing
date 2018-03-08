@@ -39,9 +39,9 @@ const App = () => (
 )
 
 const main = async () => {
-  const { error, user } = await api.get('/api/user/auth')
-  if (!error) {
-    store.dispatch(authenticate(user))
+  const res = await api.get('/api/user/auth')
+  if (!res.error) {
+    store.dispatch(authenticate(res))
   }
   render(
     <Provider store={store}>

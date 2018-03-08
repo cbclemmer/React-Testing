@@ -3,7 +3,7 @@ import * as passportLocal from 'passport-local'
 
 import { Db, ObjectId } from 'mongodb'
 import { Express, Request, Response, NextFunction } from 'express-serve-static-core'
-import { pick, omit } from 'lodash'
+import { omit } from 'lodash'
 
 import User from './classes/user'
 import Collection from './collections'
@@ -12,13 +12,14 @@ import Procedures from './procedures'
 const LocalStrategy = passportLocal.Strategy
 
 export default (procedures: Procedures) => {
+  // The serialization process makes it a string
   passport.serializeUser(({ id }, done) => {
     done(null, id)
   })
 
   passport.deserializeUser(async (id: string, done) => {
     try {
-      const user = await procedures.user_get_dbId(id)
+      const user = await new User(procedures).load(new ObjectId(id))
       return done(null, user)
     } catch (e) {
       done(e, null)
@@ -30,11 +31,11 @@ export default (procedures: Procedures) => {
   },
   async (email, password, done) => {
     const user = new User(procedures)
-    await user.find(email, password)
-    if (user.error) {
-      return done(null, false, { message: user.error })
+    try {
+      done(null, await user.find(email, password))
+    } catch (error) {
+      return done(null, false, { message: error })
     }
-    return done(null, user)
   }))
 }
 
@@ -44,17 +45,16 @@ export function authenticate(request: Request, response: Response, next: NextFun
       if (err) {
         return resolve({ error: err })
       }
-      if (!user) {
+      if (!user || (info && info.message)) {
         return resolve({ error: info.message })
       }
-      const error = await login(request, user)
-      if (error) {
+      try {
+        login(request, user)
+      } catch (error) {
         return resolve({ error })
       }
-      resolve({
-        user: user.safeData,
-        error: info ? info.message : null
-      })
+
+      return resolve(user)
     })(request, response, next)
   })
 }
@@ -62,7 +62,10 @@ export function authenticate(request: Request, response: Response, next: NextFun
 export function login(request: Request, user: User): Promise<any> {
   return new Promise((resolve, reject) => {
     request.login(user, (err) => {
-      resolve(err)
+      if (err) {
+        reject(err)
+      }
+      resolve()
     })
   })
 }

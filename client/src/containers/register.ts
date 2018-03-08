@@ -12,14 +12,14 @@ export default connect(
   (dispatch, props) => ({
     onSubmit: async (e: React.FormEvent<HTMLFormElement>, model: RegisterModel, history: any) => {
       e.preventDefault()
-      const { error, user } = await api.post('/api/user/register', model.toStrings())
-      if (error) {
+      const res = await api.post('/api/user/register', model.toStrings())
+      if (res.error) {
         return
       }
-      const u = new User(user)
+      const u = new User(res)
       dispatch(authenticate(u))
       toastr.success('Reigstered User')
-      history.push('/users/' + u.id)
+      history.push('/user/' + u.id)
     }
   })
 )(Register)

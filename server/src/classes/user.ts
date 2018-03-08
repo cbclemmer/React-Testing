@@ -1,5 +1,5 @@
-import { extend, pick, noop } from 'lodash'
-import { Db, ObjectId } from 'mongodb'
+import { extend, noop } from 'lodash'
+import { Db, ObjectId, ObjectID } from 'mongodb'
 
 import Procedures, { IUserSchema } from '../procedures'
 
@@ -16,63 +16,57 @@ export interface IUserSafeData {
   email: string
 }
 
-async function validateRegistration(procedures: Procedures, m: IRegisterModel) {
+async function validateRegistration(procedures: Procedures, m: IRegisterModel): Promise<void> {
   if (!m.userName || !m.email || !m.password || !m.confirmPassword) {
-    return 'Invalid request parameters'
+    throw 'Invalid request parameters'
   }
   if (m.userName.length === 0
     || m.email.length === 0
     || m.password.length === 0
   ) {
-    return 'Some fields are empty'
+    throw 'Some fields are empty'
   }
   if (m.password !== m.confirmPassword) {
-    return 'Password does not match confirmation'
+    throw 'Password does not match confirmation'
   }
   if (m.password.length < 8) {
-    return 'Password must be at least 8 characters'
+    throw 'Password must be at least 8 characters'
   }
 
   // If we find either one, error out
   try {
     await procedures.user_get_byEmail(m.email)
-    return 'Email is already taken'
+    throw 'Email is already taken'
   } catch (e) {
     noop()
   }
 
   try {
     await procedures.user_get_byUserName(m.userName)
-    return 'Username already taken'
+    throw 'Username already taken'
   } catch (e) {
     noop()
   }
-
-  return null
 }
 
 export default class User {
   public static async create(procedures: Procedures, data: IRegisterModel): Promise<User> {
-    const error = await validateRegistration(procedures, data)
-    const u = new User(procedures)
-    if (error) {
-      u.error = error
-      return u
+    try {
+      await validateRegistration(procedures, data)
+    } catch (error) {
+      throw error
     }
-    const user = await procedures.user_post_create({
+    const user = new User(procedures)
+    return user.fromDbObject(await procedures.user_post_create({
       userName: data.userName,
       email: data.email,
       password: data.password
-    })
-
-    await u.load(user._id.toString())
-    return u
+    }))
   }
 
-  public id: string
+  public id: ObjectId
   public userName: string
   public email: string
-  public error: string
   public loaded: boolean = false
   private procedures: Procedures
 
@@ -80,29 +74,37 @@ export default class User {
     this.procedures = procedures
   }
 
-  public async find(email: string, password: string) {
+  public async find(email: string, password: string): Promise<User> {
     try {
       this.fromDbObject(await this.procedures.user_get_auth(email, password))
+      return this
     } catch (error) {
-      this.error = error
+      throw error
     }
   }
 
-  public async load(id: string) {
+  public async load(id: ObjectId): Promise<User> {
     try {
       this.fromDbObject(await this.procedures.user_get_dbId(id))
+      return this
     } catch (error) {
-      this.error = error
+      throw error
     }
   }
 
   public get safeData(): IUserSafeData {
-    return pick(this, ['id', 'userName', 'email'])
+    return {
+      id: this.id.toString(),
+      userName: this.userName,
+      email: this.email
+    }
   }
 
-  private fromDbObject(user: IUserSchema): void {
-    this.id = user._id.toString()
-    extend(this, pick(user, ['userName', 'email']))
+  public fromDbObject(user: IUserSchema): User {
+    this.id = user._id
+    this.userName = user.userName
+    this.email = user.email
     this.loaded = true
+    return this
   }
 }
