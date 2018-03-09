@@ -40,12 +40,8 @@ export default class Tweet {
   }
 
   public async load(id: ObjectId): Promise<Tweet> {
-    try {
-      this.fromDbObject(await this.procudures.tweet_get_byId(id))
-      return this
-    } catch (error) {
-      throw error
-    }
+    this.fromDbObject(await this.procudures.tweet_get_byId(id))
+    return this
   }
 
   public fromDbObject(tweet: ITweetSchema): Tweet {

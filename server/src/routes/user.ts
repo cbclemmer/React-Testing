@@ -44,4 +44,14 @@ export default function(app: Express, procedures: Procedures) {
     req.logout()
     res.json({ error: false })
   })
+
+  app.post('/api/user/follow', async (req: Request, res: Response) => {
+    try {
+      const user = await new User(procedures).load(req.user.id)
+      await user.follow(new ObjectId(req.body.destination))
+      return res.json({ error: false })
+    } catch (error) {
+      return res.json({ error })
+    }
+  })
 }

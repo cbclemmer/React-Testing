@@ -75,21 +75,17 @@ export default class User {
   }
 
   public async find(email: string, password: string): Promise<User> {
-    try {
-      this.fromDbObject(await this.procedures.user_get_auth(email, password))
-      return this
-    } catch (error) {
-      throw error
-    }
+    this.fromDbObject(await this.procedures.user_get_auth(email, password))
+    return this
   }
 
   public async load(id: ObjectId): Promise<User> {
-    try {
-      this.fromDbObject(await this.procedures.user_get_dbId(id))
-      return this
-    } catch (error) {
-      throw error
-    }
+    this.fromDbObject(await this.procedures.user_get_dbId(id))
+    return this
+  }
+
+  public async follow(destination: ObjectId): Promise<void> {
+    await this.procedures.follow_post_follow(this.id, destination)
   }
 
   public get safeData(): IUserSafeData {
