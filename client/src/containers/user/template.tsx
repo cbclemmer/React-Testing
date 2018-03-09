@@ -9,8 +9,11 @@ import { UserPage } from './index'
 const tweetForm = (page: UserPage) =>
   <div>
     <textarea id="tweet-area" onChange={page.handleChange.bind(page)} className="form-control"></textarea>
+    <span style={{ color: page.state.isOverLength ? 'red' : 'black', float: 'right' }}>
+    {page.state.contents.length}/140
+    </span>
     <br />
-    <Button color="primary" onClick={page.sendTweet.bind(page)}>
+    <Button color="primary" onClick={page.sendTweet.bind(page)} disabled={page.state.isOverLength}>
       Send Tweet
     </Button>
   </div>

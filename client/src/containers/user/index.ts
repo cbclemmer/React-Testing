@@ -16,6 +16,7 @@ class UserPageState {
   public contents: string = ''
   public loaded: boolean = false
   public isSelf: boolean = false
+  public isOverLength: boolean = false
 }
 
 export class UserPage extends React.Component {
@@ -53,7 +54,10 @@ export class UserPage extends React.Component {
   }
 
   public handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-    this.setState({ contents: event.target.value })
+    this.setState({
+      isOverLength: event.target.value.length > 140,
+      contents: event.target.value
+    })
   }
 
   public async sendTweet() {
