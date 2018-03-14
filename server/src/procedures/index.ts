@@ -49,7 +49,7 @@ export default class Procedures {
         localField: '_id',
         foreignField: 'origin',
         as: 'following'
-      }
+      },
       {
         from: Collections.Follow,
         localField: '_id',

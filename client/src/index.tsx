@@ -20,6 +20,7 @@ import { NativeRouter } from 'react-router-native'
 
 import * as api from './utils/api'
 import { authenticate } from './actions'
+import 'font-awesome/css/font-awesome.min.css'
 
 const store = createStore(reducers)
 
